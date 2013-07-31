@@ -1,14 +1,17 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 import time
 start_time = time.time()
 
+import os
+dir = os.path.dirname(__file__)
+
 # get the parser
 from pijnu import makeParser
-preprocessorGrammar = file("preprocessor.pijnu").read()
+preprocessorGrammar = file(os.path.join(dir, "preprocessor.pijnu")).read()
 makeParser(preprocessorGrammar)
 
-mediawikiGrammar = file("mediawiki.pijnu").read()
+mediawikiGrammar = file(os.path.join(dir, "mediawiki.pijnu")).read()
 makeParser(mediawikiGrammar)
 
 allowed_tags = ['p', 'span', 'b', 'i', 'small', 'center']
