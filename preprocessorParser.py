@@ -77,11 +77,11 @@
     optional_value          : parameter_value?
     parameter_equal         : SPACETABEOL* EQUAL SPACETABEOL*
     parameter_name          : (!(esc_char/parameter_equal) raw_char)+                               : join
-    named_parameter         : parameter_name parameter_equal optional_value
+    named_parameter         : parameter_name parameter_equal html_comment* optional_value
     standalone_parameter    : value_content?                                                        : join
-    parameter               : SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter) : liftValue
+    parameter               : SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter) html_comment* : liftValue
     parameters              : parameter*
-    template                : TEMPLATE_BEGIN page_name parameters SPACETABEOL* TEMPLATE_END         : substitute_template
+    template                : TEMPLATE_BEGIN page_name html_comment* parameters SPACETABEOL* TEMPLATE_END         : substitute_template
 
 # inline allows to have templates/links inside templates/links
 
@@ -223,11 +223,11 @@ def make_parser(actions=None):
     optional_value = Option(parameter_value, expression='parameter_value?', name='optional_value')
     parameter_equal = Sequence([Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), EQUAL, Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*')], expression='SPACETABEOL* EQUAL SPACETABEOL*', name='parameter_equal')
     parameter_name = Repetition(Sequence([NextNot(Choice([esc_char, parameter_equal], expression='esc_char/parameter_equal'), expression='!(esc_char/parameter_equal)'), raw_char], expression='!(esc_char/parameter_equal) raw_char'), numMin=1, numMax=False, expression='(!(esc_char/parameter_equal) raw_char)+', name='parameter_name')(toolset['join'])
-    named_parameter = Sequence([parameter_name, parameter_equal, optional_value], expression='parameter_name parameter_equal optional_value', name='named_parameter')
+    named_parameter = Sequence([parameter_name, parameter_equal, Repetition(html_comment, numMin=False, numMax=False, expression='html_comment*'), optional_value], expression='parameter_name parameter_equal html_comment* optional_value', name='named_parameter')
     standalone_parameter = Option(value_content, expression='value_content?', name='standalone_parameter')(toolset['join'])
-    parameter = Sequence([Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), PIPE, Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), Choice([named_parameter, standalone_parameter], expression='named_parameter/standalone_parameter')], expression='SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter)', name='parameter')(toolset['liftValue'])
+    parameter = Sequence([Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), PIPE, Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), Choice([named_parameter, standalone_parameter], expression='named_parameter/standalone_parameter'), Repetition(html_comment, numMin=False, numMax=False, expression='html_comment*')], expression='SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter) html_comment*', name='parameter')(toolset['liftValue'])
     parameters = Repetition(parameter, numMin=False, numMax=False, expression='parameter*', name='parameters')
-    template = Sequence([TEMPLATE_BEGIN, page_name, parameters, Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), TEMPLATE_END], expression='TEMPLATE_BEGIN page_name parameters SPACETABEOL* TEMPLATE_END', name='template')(toolset['substitute_template'])
+    template = Sequence([TEMPLATE_BEGIN, page_name, Repetition(html_comment, numMin=False, numMax=False, expression='html_comment*'), parameters, Repetition(SPACETABEOL, numMin=False, numMax=False, expression='SPACETABEOL*'), TEMPLATE_END], expression='TEMPLATE_BEGIN page_name html_comment* parameters SPACETABEOL* TEMPLATE_END', name='template')(toolset['substitute_template'])
     
     # inline allows to have templates/links inside templates/links
     

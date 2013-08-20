@@ -81,11 +81,11 @@ def replace_by_space(node):
     optional_value          : parameter_value?
     parameter_equal         : SPACETABEOL* EQUAL SPACETABEOL*
     parameter_name          : (!(esc_char/parameter_equal) raw_char)+                               : join
-    named_parameter         : parameter_name parameter_equal optional_value
+    named_parameter         : parameter_name parameter_equal html_comment* optional_value
     standalone_parameter    : value_content?                                                        : join
-    parameter               : SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter) : liftValue
+    parameter               : SPACETABEOL* PIPE SPACETABEOL* (named_parameter/standalone_parameter) html_comment* : liftValue
     parameters              : parameter*
-    template                : TEMPLATE_BEGIN page_name parameters SPACETABEOL* TEMPLATE_END         : substitute_template
+    template                : TEMPLATE_BEGIN page_name html_comment* parameters SPACETABEOL* TEMPLATE_END         : substitute_template
 
 # inline allows to have templates/links inside templates/links
 
